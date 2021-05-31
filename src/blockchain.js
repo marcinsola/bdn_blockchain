@@ -45,7 +45,7 @@ class Blockchain {
      * Utility method that return a Promise that will resolve with the height of the chain
      */
     getChainHeight() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             resolve(this.height);
         });
     }
@@ -119,8 +119,8 @@ class Blockchain {
 
             if (currentTime - timestamp < 300) {
                 bitcoinMessage.verify(message, address, signature)
-                const block = new BlockClass(message);
-                self._addBlock(block);
+                const block = new BlockClass.Block({ owner: address, star: star });
+                await self._addBlock(block);
                 resolve(block);
             }
 
@@ -173,9 +173,9 @@ class Blockchain {
         let self = this;
         let stars = [];
         return new Promise((resolve) => {
-            self.chain.forEach((block) => {
-                const data = JSON.parse(hex2ascii(block.data));
-                if (data.star.owner === address) {
+            self.chain.filter((block) => {
+                const data = JSON.parse(hex2ascii(block.body));
+                if (data.owner === address) {
                     stars.push(data.star);
                 }
             });
@@ -194,10 +194,7 @@ class Blockchain {
         let self = this;
         let errorLog = [];
         return new Promise(async (resolve) => {
-            self.chain.forEach((block) => {
-                block.validate().catch((err) => errorLog.push(err));
-            });
-
+            self.chain.forEach((block) => block.validate().catch((err) => errorLog.push(err)));
             resolve(errorLog);
         });
     }

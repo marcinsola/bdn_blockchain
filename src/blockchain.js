@@ -118,7 +118,7 @@ class Blockchain {
             const currentTime = parseInt(Date.now().toString().slice(0, -3));
 
             if (currentTime - timestamp < 300 && bitcoinMessage.verify(message, address, signature)) {
-                block = new BlockClass.Block({ owner: address, star: star });
+                const block = new BlockClass.Block({ owner: address, star: star });
                 await self._addBlock(block);
 
                 resolve(block);
